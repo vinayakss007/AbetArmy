@@ -22,6 +22,17 @@ interface RegisterData {
   stage?: string;
 }
 
+// Helper to set a cookie readable by Next.js edge middleware
+function setAuthCookie(token: string): void {
+  document.cookie = `access_token=${token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
+  document.cookie = `craq_authenticated=true; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
+}
+
+function clearAuthCookies(): void {
+  document.cookie = 'access_token=; path=/; max-age=0';
+  document.cookie = 'craq_authenticated=; path=/; max-age=0';
+}
+
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   token: typeof window !== 'undefined' ? localStorage.getItem('access_token') : null,
@@ -35,6 +46,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       const { accessToken, refreshToken, user } = response.data;
       localStorage.setItem('access_token', accessToken);
       localStorage.setItem('refresh_token', refreshToken);
+      setAuthCookie(accessToken);
       set({ user, token: accessToken, isAuthenticated: true, isLoading: false });
     } catch (error) {
       set({ isLoading: false });
@@ -49,6 +61,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       const { accessToken, refreshToken, user } = response.data;
       localStorage.setItem('access_token', accessToken);
       localStorage.setItem('refresh_token', refreshToken);
+      setAuthCookie(accessToken);
       set({ user, token: accessToken, isAuthenticated: true, isLoading: false });
     } catch (error) {
       set({ isLoading: false });
@@ -59,6 +72,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   logout: () => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
+    clearAuthCookies();
     set({ user: null, token: null, isAuthenticated: false });
   },
 
@@ -70,10 +84,12 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
     try {
       const response = await api.get('/auth/me');
+      setAuthCookie(token);
       set({ user: response.data, token, isAuthenticated: true });
     } catch {
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
+      clearAuthCookies();
       set({ user: null, token: null, isAuthenticated: false });
     }
   },

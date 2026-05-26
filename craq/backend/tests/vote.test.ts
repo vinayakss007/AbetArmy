@@ -1,10 +1,15 @@
+const mockClient = {
+  query: jest.fn(),
+  release: jest.fn(),
+};
+
 jest.mock('../src/config/database', () => ({
   query: jest.fn(),
-  connect: jest.fn(),
+  connect: jest.fn(() => Promise.resolve(mockClient)),
   __esModule: true,
   default: {
     query: jest.fn(),
-    connect: jest.fn(),
+    connect: jest.fn(() => Promise.resolve(mockClient)),
   },
 }));
 
@@ -19,6 +24,8 @@ describe('VoteService', () => {
   beforeEach(() => {
     voteService = new VoteService();
     jest.clearAllMocks();
+    // Reset connect to return mockClient
+    (mockPool.connect as jest.Mock).mockResolvedValue(mockClient);
   });
 
   describe('vote', () => {
@@ -32,18 +39,25 @@ describe('VoteService', () => {
         created_at: new Date(),
       };
 
+      // BEGIN
+      mockClient.query.mockResolvedValueOnce({ rows: [] });
+      // SELECT FOR UPDATE (lock target row)
+      mockClient.query.mockResolvedValueOnce({ rows: [{ id: 'issue-uuid' }] });
       // Check existing vote
-      (mockPool.query as jest.Mock).mockResolvedValueOnce({ rows: [] });
+      mockClient.query.mockResolvedValueOnce({ rows: [] });
       // Insert new vote
-      (mockPool.query as jest.Mock).mockResolvedValueOnce({ rows: [mockVote] });
+      mockClient.query.mockResolvedValueOnce({ rows: [mockVote] });
       // Update target count
-      (mockPool.query as jest.Mock).mockResolvedValueOnce({ rows: [] });
+      mockClient.query.mockResolvedValueOnce({ rows: [] });
+      // COMMIT
+      mockClient.query.mockResolvedValueOnce({ rows: [] });
 
       const result = await voteService.vote('user-uuid', 'issue', 'issue-uuid', 1);
 
       expect(result.vote).toBeDefined();
       expect(result.removed).toBe(false);
       expect(result.vote!.value).toBe(1);
+      expect(mockClient.release).toHaveBeenCalled();
     });
 
     it('should toggle off an existing same vote', async () => {
@@ -55,17 +69,24 @@ describe('VoteService', () => {
         value: 1,
       };
 
+      // BEGIN
+      mockClient.query.mockResolvedValueOnce({ rows: [] });
+      // SELECT FOR UPDATE
+      mockClient.query.mockResolvedValueOnce({ rows: [{ id: 'issue-uuid' }] });
       // Check existing vote (same value)
-      (mockPool.query as jest.Mock).mockResolvedValueOnce({ rows: [existingVote] });
+      mockClient.query.mockResolvedValueOnce({ rows: [existingVote] });
       // Delete vote
-      (mockPool.query as jest.Mock).mockResolvedValueOnce({ rows: [] });
+      mockClient.query.mockResolvedValueOnce({ rows: [] });
       // Update target count
-      (mockPool.query as jest.Mock).mockResolvedValueOnce({ rows: [] });
+      mockClient.query.mockResolvedValueOnce({ rows: [] });
+      // COMMIT
+      mockClient.query.mockResolvedValueOnce({ rows: [] });
 
       const result = await voteService.vote('user-uuid', 'issue', 'issue-uuid', 1);
 
       expect(result.vote).toBeNull();
       expect(result.removed).toBe(true);
+      expect(mockClient.release).toHaveBeenCalled();
     });
 
     it('should switch from upvote to downvote', async () => {
@@ -79,20 +100,27 @@ describe('VoteService', () => {
 
       const updatedVote = { ...existingVote, value: -1 };
 
+      // BEGIN
+      mockClient.query.mockResolvedValueOnce({ rows: [] });
+      // SELECT FOR UPDATE
+      mockClient.query.mockResolvedValueOnce({ rows: [{ id: 'issue-uuid' }] });
       // Check existing vote (different value)
-      (mockPool.query as jest.Mock).mockResolvedValueOnce({ rows: [existingVote] });
+      mockClient.query.mockResolvedValueOnce({ rows: [existingVote] });
       // Update vote
-      (mockPool.query as jest.Mock).mockResolvedValueOnce({ rows: [updatedVote] });
+      mockClient.query.mockResolvedValueOnce({ rows: [updatedVote] });
       // Remove old count
-      (mockPool.query as jest.Mock).mockResolvedValueOnce({ rows: [] });
+      mockClient.query.mockResolvedValueOnce({ rows: [] });
       // Add new count
-      (mockPool.query as jest.Mock).mockResolvedValueOnce({ rows: [] });
+      mockClient.query.mockResolvedValueOnce({ rows: [] });
+      // COMMIT
+      mockClient.query.mockResolvedValueOnce({ rows: [] });
 
       const result = await voteService.vote('user-uuid', 'issue', 'issue-uuid', -1);
 
       expect(result.vote).toBeDefined();
       expect(result.vote!.value).toBe(-1);
       expect(result.removed).toBe(false);
+      expect(mockClient.release).toHaveBeenCalled();
     });
 
     it('should reject invalid vote value', async () => {

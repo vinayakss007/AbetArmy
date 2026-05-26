@@ -32,10 +32,11 @@ router.post('/login', validate(loginSchema), authController.login);
 router.post('/refresh', validate(refreshSchema), authController.refresh);
 router.get('/me', authenticate, authController.me);
 
-// Google OAuth routes (passport handles the redirect)
+// TODO(MVP): Google OAuth is a stub. To enable, install passport + passport-google-oauth20,
+// configure the strategy with GOOGLE_CLIENT_ID/GOOGLE_CLIENT_SECRET, and replace this
+// handler with passport.authenticate('google', { scope: ['profile', 'email'] }).
 router.get('/google', (_req, res) => {
-  // In production, redirect to Google OAuth consent screen
-  res.json({ message: 'Google OAuth endpoint - configure passport strategy' });
+  res.status(501).json({ message: 'Google OAuth not yet configured. Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET.' });
 });
 
 router.get('/google/callback', authController.googleCallback);

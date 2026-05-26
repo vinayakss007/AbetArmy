@@ -87,14 +87,17 @@ export class UploadService {
     key: string,
     contentType: string
   ): Promise<UploadResult> {
-    // Use fetch to PUT to S3-compatible endpoint
+    // TODO(MVP): S3 upload currently uses unsigned requests which will be rejected by
+    // any real S3 endpoint enforcing authentication. For production, replace with the
+    // AWS SDK (@aws-sdk/client-s3) or implement SigV4 signing. For now, only local
+    // storage is functional. This code path is guarded by STORAGE_TYPE=s3.
     const endpoint =
       this.s3Endpoint ||
       `https://${this.s3Bucket}.s3.${this.s3Region}.amazonaws.com`;
     const url = `${endpoint}/${key}`;
 
+    // TODO(MVP): This unsigned PUT will fail against real S3. See uploadToS3 TODO above.
     // For S3-compatible storage, use presigned URL or direct PUT
-    // This is a simplified implementation; production would use AWS SDK
     const response = await fetch(url, {
       method: 'PUT',
       headers: {

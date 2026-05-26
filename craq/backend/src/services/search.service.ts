@@ -1,5 +1,10 @@
 import pool from '../config/database';
 
+// TODO(MVP): Docker Compose provisions a Meilisearch container and passes MEILI_HOST/MEILI_MASTER_KEY
+// to the backend, but this service currently uses PostgreSQL full-text search directly.
+// For production, integrate Meilisearch for better relevance ranking and typo tolerance.
+// The Meilisearch container can be removed from docker-compose.yml if not needed.
+
 export interface SearchFilters {
   type?: string;
   industry?: string;

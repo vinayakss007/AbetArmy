@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import userService from '../services/user.service';
+import { createError } from '../middleware/errorHandler';
 
 export class UserController {
   async getProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -13,6 +14,12 @@ export class UserController {
 
   async updateProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
+      const userId = req.user!.userId;
+
+      if (req.params.id !== userId) {
+        throw createError('You can only update your own profile', 403, 'FORBIDDEN');
+      }
+
       const user = await userService.updateProfile(req.params.id as string, req.body);
       res.json(user);
     } catch (error) {

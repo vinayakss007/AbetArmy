@@ -12,6 +12,12 @@ declare global {
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-key';
 
+// Warn at module load if running with default secret in non-production
+// Production check is in auth.service.ts which will exit the process
+if (!process.env.JWT_SECRET && process.env.NODE_ENV !== 'test') {
+  console.warn('WARNING: JWT_SECRET not set, using insecure default. Do NOT use in production.');
+}
+
 export const authenticate = (
   req: Request,
   res: Response,

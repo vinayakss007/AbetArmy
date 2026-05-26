@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import commentService from '../services/comment.service';
+import { createError } from '../middleware/errorHandler';
 
 export class CommentController {
   async create(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -26,9 +27,16 @@ export class CommentController {
 
   async update(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
+      const userId = req.user!.userId;
+      const comment = await commentService.getById(req.params.id as string);
+
+      if (comment.author_id !== userId) {
+        throw createError('You can only edit your own comments', 403, 'FORBIDDEN');
+      }
+
       const { content } = req.body;
-      const comment = await commentService.update(req.params.id as string, content);
-      res.json(comment);
+      const updated = await commentService.update(req.params.id as string, content);
+      res.json(updated);
     } catch (error) {
       next(error);
     }
@@ -36,6 +44,13 @@ export class CommentController {
 
   async delete(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
+      const userId = req.user!.userId;
+      const comment = await commentService.getById(req.params.id as string);
+
+      if (comment.author_id !== userId) {
+        throw createError('You can only delete your own comments', 403, 'FORBIDDEN');
+      }
+
       await commentService.delete(req.params.id as string);
       res.status(204).send();
     } catch (error) {

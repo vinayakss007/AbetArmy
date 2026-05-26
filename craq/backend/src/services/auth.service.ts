@@ -5,10 +5,28 @@ import pool from '../config/database';
 import { User, AuthPayload, TokenPair } from '../types';
 import { createError } from '../middleware/errorHandler';
 
+const KNOWN_UNSAFE_SECRETS = [
+  'dev-secret-key',
+  'dev-refresh-secret-key',
+  'change-me-in-production',
+];
+
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-key';
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'dev-refresh-secret-key';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '1h';
 const JWT_REFRESH_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || '7d';
+
+// Validate secrets at startup in production
+if (process.env.NODE_ENV === 'production') {
+  if (KNOWN_UNSAFE_SECRETS.includes(JWT_SECRET)) {
+    console.error('FATAL: JWT_SECRET is set to a known default value. Set a secure secret before running in production.');
+    process.exit(1);
+  }
+  if (KNOWN_UNSAFE_SECRETS.includes(JWT_REFRESH_SECRET)) {
+    console.error('FATAL: JWT_REFRESH_SECRET is set to a known default value. Set a secure secret before running in production.');
+    process.exit(1);
+  }
+}
 
 // Parse duration string to seconds
 function parseDuration(duration: string): number {

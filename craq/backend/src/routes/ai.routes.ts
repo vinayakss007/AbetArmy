@@ -30,7 +30,7 @@ const solutionDraftSchema = z.object({
 
 const summarizeSchema = z.object({
   body: z.object({
-    comments: z.array(z.string()).min(1),
+    comments: z.array(z.string().max(5000)).min(1).max(100),
   }),
 });
 
@@ -39,12 +39,12 @@ const chatSchema = z.object({
     messages: z.array(
       z.object({
         role: z.enum(['system', 'user', 'assistant']),
-        content: z.string(),
+        content: z.string().max(10000),
       })
-    ).min(1),
+    ).min(1).max(50),
     stream: z.boolean().optional(),
     temperature: z.number().min(0).max(2).optional(),
-    maxTokens: z.number().min(1).optional(),
+    maxTokens: z.number().min(1).max(4096).optional(),
   }),
 });
 

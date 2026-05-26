@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import solutionService from '../services/solution.service';
+import { createError } from '../middleware/errorHandler';
 
 export class SolutionController {
   async create(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -25,8 +26,15 @@ export class SolutionController {
 
   async update(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const solution = await solutionService.update(req.params.id as string, req.body);
-      res.json(solution);
+      const userId = req.user!.userId;
+      const solution = await solutionService.getById(req.params.id as string);
+
+      if (solution.author_id !== userId) {
+        throw createError('You can only edit your own solutions', 403, 'FORBIDDEN');
+      }
+
+      const updated = await solutionService.update(req.params.id as string, req.body);
+      res.json(updated);
     } catch (error) {
       next(error);
     }
@@ -34,6 +42,13 @@ export class SolutionController {
 
   async delete(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
+      const userId = req.user!.userId;
+      const solution = await solutionService.getById(req.params.id as string);
+
+      if (solution.author_id !== userId) {
+        throw createError('You can only delete your own solutions', 403, 'FORBIDDEN');
+      }
+
       await solutionService.delete(req.params.id as string);
       res.status(204).send();
     } catch (error) {

@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import issueService from '../services/issue.service';
+import { createError } from '../middleware/errorHandler';
 
 export class IssueController {
   async create(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -50,8 +51,15 @@ export class IssueController {
 
   async update(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const issue = await issueService.update(req.params.id as string, req.body);
-      res.json(issue);
+      const userId = req.user!.userId;
+      const issue = await issueService.getById(req.params.id as string);
+
+      if (issue.author_id !== userId) {
+        throw createError('You can only edit your own issues', 403, 'FORBIDDEN');
+      }
+
+      const updated = await issueService.update(req.params.id as string, req.body);
+      res.json(updated);
     } catch (error) {
       next(error);
     }
@@ -59,6 +67,13 @@ export class IssueController {
 
   async delete(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
+      const userId = req.user!.userId;
+      const issue = await issueService.getById(req.params.id as string);
+
+      if (issue.author_id !== userId) {
+        throw createError('You can only delete your own issues', 403, 'FORBIDDEN');
+      }
+
       await issueService.delete(req.params.id as string);
       res.status(204).send();
     } catch (error) {
@@ -68,9 +83,16 @@ export class IssueController {
 
   async solve(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
+      const userId = req.user!.userId;
+      const issue = await issueService.getById(req.params.id as string);
+
+      if (issue.author_id !== userId) {
+        throw createError('Only the issue author can mark it as solved', 403, 'FORBIDDEN');
+      }
+
       const { solutionId } = req.body;
-      const issue = await issueService.markSolved(req.params.id as string, solutionId);
-      res.json(issue);
+      const updated = await issueService.markSolved(req.params.id as string, solutionId);
+      res.json(updated);
     } catch (error) {
       next(error);
     }

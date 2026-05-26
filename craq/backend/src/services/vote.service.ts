@@ -14,43 +14,63 @@ export class VoteService {
       throw createError('Vote value must be 1 or -1', 400, 'INVALID_VOTE_VALUE');
     }
 
-    // Check if user already voted on this target
-    const existing = await pool.query(
-      'SELECT * FROM votes WHERE user_id = $1 AND target_type = $2 AND target_id = $3',
-      [userId, targetType, targetId]
-    );
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
 
-    if (existing.rows.length > 0) {
-      const existingVote = existing.rows[0];
+      // Lock the target row to prevent concurrent counter drift
+      const table = targetType === 'issue' ? 'issues' : 'solutions';
+      await client.query(
+        `SELECT id FROM ${table} WHERE id = $1 FOR UPDATE`,
+        [targetId]
+      );
 
-      if (existingVote.value === value) {
-        // Same vote - remove it (toggle off)
-        await pool.query('DELETE FROM votes WHERE id = $1', [existingVote.id]);
-        await this.updateTargetVoteCount(targetType, targetId, value, -1);
-        return { vote: null, removed: true };
+      // Check if user already voted on this target
+      const existing = await client.query(
+        'SELECT * FROM votes WHERE user_id = $1 AND target_type = $2 AND target_id = $3',
+        [userId, targetType, targetId]
+      );
+
+      let result: { vote: Vote | null; removed: boolean };
+
+      if (existing.rows.length > 0) {
+        const existingVote = existing.rows[0];
+
+        if (existingVote.value === value) {
+          // Same vote - remove it (toggle off)
+          await client.query('DELETE FROM votes WHERE id = $1', [existingVote.id]);
+          await this.updateTargetVoteCountWithClient(client, targetType, targetId, value, -1);
+          result = { vote: null, removed: true };
+        } else {
+          // Different vote - update it
+          const updateResult = await client.query(
+            'UPDATE votes SET value = $1 WHERE id = $2 RETURNING *',
+            [value, existingVote.id]
+          );
+          // Remove old vote count and add new
+          await this.updateTargetVoteCountWithClient(client, targetType, targetId, existingVote.value, -1);
+          await this.updateTargetVoteCountWithClient(client, targetType, targetId, value, 1);
+          result = { vote: updateResult.rows[0], removed: false };
+        }
       } else {
-        // Different vote - update it
-        const result = await pool.query(
-          'UPDATE votes SET value = $1 WHERE id = $2 RETURNING *',
-          [value, existingVote.id]
+        // New vote
+        const id = uuidv4();
+        const insertResult = await client.query(
+          'INSERT INTO votes (id, user_id, target_type, target_id, value) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+          [id, userId, targetType, targetId, value]
         );
-        // Remove old vote and add new
-        await this.updateTargetVoteCount(targetType, targetId, existingVote.value, -1);
-        await this.updateTargetVoteCount(targetType, targetId, value, 1);
-        return { vote: result.rows[0], removed: false };
+        await this.updateTargetVoteCountWithClient(client, targetType, targetId, value, 1);
+        result = { vote: insertResult.rows[0], removed: false };
       }
+
+      await client.query('COMMIT');
+      return result;
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
     }
-
-    // New vote
-    const id = uuidv4();
-    const result = await pool.query(
-      'INSERT INTO votes (id, user_id, target_type, target_id, value) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-      [id, userId, targetType, targetId, value]
-    );
-
-    await this.updateTargetVoteCount(targetType, targetId, value, 1);
-
-    return { vote: result.rows[0], removed: false };
   }
 
   async getVotes(
@@ -85,7 +105,8 @@ export class VoteService {
     return result.rows[0] || null;
   }
 
-  private async updateTargetVoteCount(
+  private async updateTargetVoteCountWithClient(
+    client: { query: typeof pool.query },
     targetType: string,
     targetId: string,
     value: number,
@@ -94,7 +115,7 @@ export class VoteService {
     const table = targetType === 'issue' ? 'issues' : 'solutions';
     const column = value === 1 ? 'upvotes' : 'downvotes';
 
-    await pool.query(
+    await client.query(
       `UPDATE ${table} SET ${column} = ${column} + $1 WHERE id = $2`,
       [direction, targetId]
     );
