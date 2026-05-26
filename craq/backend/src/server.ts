@@ -1,5 +1,7 @@
+import http from 'http';
 import app from './app';
 import pool from './config/database';
+import { initializeWebSocket } from './websocket';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -12,8 +14,13 @@ async function start(): Promise<void> {
     await pool.query('SELECT 1');
     console.log('Database connected successfully');
 
-    app.listen(PORT, () => {
+    // Create HTTP server and attach WebSocket
+    const server = http.createServer(app);
+    initializeWebSocket(server);
+
+    server.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
+      console.log(`WebSocket available at ws://localhost:${PORT}/ws`);
       console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
     });
   } catch (error) {
