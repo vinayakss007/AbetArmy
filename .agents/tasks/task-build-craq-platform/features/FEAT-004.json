@@ -2,7 +2,7 @@
   "id": "FEAT-004",
   "type": "chore",
   "description": "Docker Compose full-stack integration, Dockerfiles for frontend and backend, environment configuration, and final README documentation.",
-  "status": "in_progress",
+  "status": "completed",
   "steps": [
     "Create /projects/sandbox/AbetArmy/craq/backend/Dockerfile - Multi-stage build: build stage with npm ci + tsc, production stage with node:22-alpine running the compiled JS.",
     "Create /projects/sandbox/AbetArmy/craq/frontend/Dockerfile - Multi-stage build: build stage with npm ci + next build, production stage with next start.",
@@ -26,5 +26,5 @@
     "cd /projects/sandbox/AbetArmy/craq && docker build -t craq-frontend ./frontend"
   ],
   "blocked_reason": null,
-  "findings": ""
+  "findings": "docker compose CLI plugin not available in sandbox (podman-based container runtime), but YAML validation and individual docker builds succeed. Backend uses port 4000 (not 3001 as originally suggested). Added output: standalone to next.config.js for frontend Docker build."
 }
