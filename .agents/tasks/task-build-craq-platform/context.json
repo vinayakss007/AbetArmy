@@ -1,0 +1,20 @@
+{
+  "project_type": "Full-stack social media platform (Next.js frontend + Express backend + PostgreSQL)",
+  "language": "TypeScript",
+  "build_system": "npm workspaces with separate frontend (Next.js) and backend (Express) packages inside /projects/sandbox/AbetArmy/craq/",
+  "test_framework": "Jest for backend, Jest + React Testing Library for frontend",
+  "build_command": "cd /projects/sandbox/AbetArmy/craq/backend && npm run build && cd /projects/sandbox/AbetArmy/craq/frontend && npm run build",
+  "test_command": "cd /projects/sandbox/AbetArmy/craq/backend && npm test && cd /projects/sandbox/AbetArmy/craq/frontend && npm test",
+  "verification_instructions": "1. Run backend build and tests. 2. Run frontend build and tests. 3. Docker compose up to verify full stack integration.",
+  "snapshot_or_generated_files": null,
+  "setup_instructions": "All built inside /projects/sandbox/AbetArmy/craq/ folder. Backend at craq/backend, frontend at craq/frontend. PostgreSQL and Redis via Docker Compose.",
+  "environment_constraints": "Node.js 22 available, Docker available, full network access for npm installs. No pre-installed PostgreSQL or Redis on host - use Docker containers.",
+  "contribution_requirements": "Greenfield project - no existing contribution guidelines. Build everything from scratch.",
+  "key_patterns": "Backend: Express + TypeScript with controllers/services/routes pattern. Frontend: Next.js App Router with server components. Auth: JWT + Google OAuth. AI: Multi-provider gateway with OpenAI-compatible API.",
+  "relevant_files": [
+    "/projects/sandbox/AbetArmy/craq/backend/src/",
+    "/projects/sandbox/AbetArmy/craq/frontend/src/",
+    "/projects/sandbox/AbetArmy/craq/docker-compose.yml"
+  ],
+  "directory_structure": "craq/ - root of the platform. craq/backend/ - Express API server. craq/frontend/ - Next.js app. craq/docker-compose.yml - PostgreSQL, Redis, Meilisearch orchestration."
+}

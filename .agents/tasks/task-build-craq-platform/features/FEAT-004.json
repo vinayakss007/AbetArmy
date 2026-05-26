@@ -1,0 +1,30 @@
+{
+  "id": "FEAT-004",
+  "type": "chore",
+  "description": "Docker Compose full-stack integration, Dockerfiles for frontend and backend, environment configuration, and final README documentation.",
+  "status": "pending",
+  "steps": [
+    "Create /projects/sandbox/AbetArmy/craq/backend/Dockerfile - Multi-stage build: build stage with npm ci + tsc, production stage with node:22-alpine running the compiled JS.",
+    "Create /projects/sandbox/AbetArmy/craq/frontend/Dockerfile - Multi-stage build: build stage with npm ci + next build, production stage with next start.",
+    "Update /projects/sandbox/AbetArmy/craq/docker-compose.yml to include backend and frontend services alongside PostgreSQL, Redis, Meilisearch. Add depends_on, health checks, proper networking, environment variable pass-through.",
+    "Create /projects/sandbox/AbetArmy/craq/.env.example with all environment variables documented (DB connection, Redis URL, JWT secret, Google OAuth credentials, AI provider API keys for OpenAI/Anthropic/Groq/Ollama, S3 config, Meilisearch key).",
+    "Create /projects/sandbox/AbetArmy/craq/README.md - Comprehensive documentation: what Craq is, features, tech stack, setup instructions (Docker Compose and local dev), environment variables guide, API documentation overview, project structure, AI configuration guide for multiple providers.",
+    "Create /projects/sandbox/AbetArmy/craq/backend/.dockerignore and /projects/sandbox/AbetArmy/craq/frontend/.dockerignore.",
+    "Verify: docker compose config validates the compose file, and docker build succeeds for both backend and frontend Dockerfiles."
+  ],
+  "acceptance_criteria": [
+    "Docker Compose file orchestrates all services (postgres, redis, meilisearch, backend, frontend)",
+    "Backend Dockerfile builds successfully",
+    "Frontend Dockerfile builds successfully",
+    "README.md documents setup, configuration, and usage",
+    "All environment variables are documented in .env.example",
+    "AI provider configuration is clearly documented for all supported providers"
+  ],
+  "verification": [
+    "cd /projects/sandbox/AbetArmy/craq && docker compose config",
+    "cd /projects/sandbox/AbetArmy/craq && docker build -t craq-backend ./backend",
+    "cd /projects/sandbox/AbetArmy/craq && docker build -t craq-frontend ./frontend"
+  ],
+  "blocked_reason": null,
+  "findings": ""
+}
