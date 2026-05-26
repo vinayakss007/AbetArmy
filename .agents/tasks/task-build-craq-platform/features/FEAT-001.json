@@ -2,7 +2,7 @@
   "id": "FEAT-001",
   "type": "feat",
   "description": "Project scaffolding, Docker Compose infrastructure, and backend foundation with database schema. Sets up the entire project structure inside /projects/sandbox/AbetArmy/craq/ folder including Express backend with TypeScript, PostgreSQL database with full schema for all entities (users, issues, solutions, comments, votes, tools, tags), JWT auth with Google OAuth, and Docker Compose for PostgreSQL + Redis.",
-  "status": "in_progress",
+  "status": "completed",
   "steps": [
     "Create /projects/sandbox/AbetArmy/craq/docker-compose.yml with PostgreSQL 16, Redis 7, and Meilisearch services. Include volume mounts and health checks.",
     "Initialize /projects/sandbox/AbetArmy/craq/backend/ as a Node.js TypeScript project with package.json including dependencies: express, pg, jsonwebtoken, bcryptjs, passport, passport-google-oauth20, multer, cors, helmet, express-rate-limit, zod, dotenv, uuid, ws. Dev deps: typescript, ts-node, nodemon, jest, ts-jest, @types/*.",
@@ -40,5 +40,5 @@
     "cd /projects/sandbox/AbetArmy/craq/backend && npm test"
   ],
   "blocked_reason": null,
-  "findings": ""
+  "findings": "Build and tests pass successfully. Used parseDuration helper to convert string durations to seconds for jwt.sign expiresIn option due to strict typing in newer @types/jsonwebtoken. Added redis package to dependencies for redis client. All 8 auth tests passing."
 }
