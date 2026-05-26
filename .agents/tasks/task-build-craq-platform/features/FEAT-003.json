@@ -2,7 +2,7 @@
   "id": "FEAT-003",
   "type": "feat",
   "description": "Frontend - Complete Next.js application with all pages, components, and features for the Craq platform. Includes auth pages, issues feed, solutions, user profiles, tools directory, search, AI features, dark/light mode, and responsive design.",
-  "status": "in_progress",
+  "status": "completed",
   "steps": [
     "Initialize /projects/sandbox/AbetArmy/craq/frontend/ as a Next.js 14 project with TypeScript, Tailwind CSS, App Router. Dependencies: next, react, react-dom, tailwindcss, postcss, autoprefixer, lucide-react, zustand (state), axios, date-fns, zod, react-hook-form, @hookform/resolvers, next-themes (dark mode), react-hot-toast, react-markdown.",
     "Create /projects/sandbox/AbetArmy/craq/frontend/tailwind.config.ts with custom theme colors for Craq brand (professional blues, purples for business), dark mode class strategy.",
@@ -61,5 +61,5 @@
     "cd /projects/sandbox/AbetArmy/craq/frontend && npm install && npm run build"
   ],
   "blocked_reason": null,
-  "findings": ""
+  "findings": "All 50 files created. Next.js build succeeds cleanly with 11 routes (6 static, 3 dynamic, 1 middleware). Used next-themes v0.4.x which no longer exports types from next-themes/dist/types - use React.ComponentProps<typeof ThemeProvider> instead. The ThemeProvider must be a client component. All pages, components, stores, types, and middleware compile without errors."
 }
