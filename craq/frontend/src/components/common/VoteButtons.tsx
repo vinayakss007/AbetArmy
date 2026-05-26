@@ -24,6 +24,7 @@ export default function VoteButtons({
   const { isAuthenticated } = useAuthStore();
   const [currentVote, setCurrentVote] = useState(initialUserVote);
   const [votes, setVotes] = useState({ up: upvotes, down: downvotes });
+  const [animateScore, setAnimateScore] = useState(false);
 
   const handleVote = async (value: number) => {
     if (!isAuthenticated) {
@@ -45,6 +46,8 @@ export default function VoteButtons({
         return updated;
       });
       setCurrentVote(newValue);
+      setAnimateScore(true);
+      setTimeout(() => setAnimateScore(false), 300);
     } catch {
       toast.error('Failed to vote');
     }
@@ -53,13 +56,13 @@ export default function VoteButtons({
   const score = votes.up - votes.down;
 
   return (
-    <div className="flex flex-col items-center gap-1">
+    <div className="flex flex-col items-center gap-0.5">
       <button
         onClick={() => handleVote(1)}
-        className={`p-1 rounded transition-colors ${
+        className={`p-1.5 rounded-xl transition-all duration-300 active:scale-90 ${
           currentVote === 1
-            ? 'text-brand-600 bg-brand-50 dark:bg-brand-900/30'
-            : 'text-gray-400 hover:text-brand-600 hover:bg-gray-100 dark:hover:bg-gray-800'
+            ? 'text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-900/30 shadow-glow-sm'
+            : 'text-gray-400 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-brand-50 dark:hover:bg-brand-900/20'
         }`}
         aria-label="Upvote"
       >
@@ -67,7 +70,9 @@ export default function VoteButtons({
       </button>
 
       <span
-        className={`text-sm font-semibold ${
+        className={`text-sm font-bold transition-all duration-300 ${
+          animateScore ? 'scale-125' : 'scale-100'
+        } ${
           score > 0
             ? 'text-brand-600 dark:text-brand-400'
             : score < 0
@@ -80,10 +85,10 @@ export default function VoteButtons({
 
       <button
         onClick={() => handleVote(-1)}
-        className={`p-1 rounded transition-colors ${
+        className={`p-1.5 rounded-xl transition-all duration-300 active:scale-90 ${
           currentVote === -1
-            ? 'text-red-500 bg-red-50 dark:bg-red-900/30'
-            : 'text-gray-400 hover:text-red-500 hover:bg-gray-100 dark:hover:bg-gray-800'
+            ? 'text-red-500 bg-red-50 dark:bg-red-900/30 shadow-[0_0_10px_rgba(239,68,68,0.15)]'
+            : 'text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20'
         }`}
         aria-label="Downvote"
       >
