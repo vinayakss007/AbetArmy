@@ -34,7 +34,13 @@ export class IssueController {
       };
 
       const result = await issueService.list(filters, pagination);
-      res.json(result);
+      res.json({
+        issues: result.issues,
+        total: result.total,
+        page: pagination.page,
+        limit: pagination.limit,
+        totalPages: Math.ceil(result.total / pagination.limit),
+      });
     } catch (error) {
       next(error);
     }

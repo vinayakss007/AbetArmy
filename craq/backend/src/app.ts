@@ -15,6 +15,10 @@ import searchRoutes from './routes/search.routes';
 import aiRoutes from './routes/ai.routes';
 import uploadRoutes from './routes/upload.routes';
 import { errorHandler } from './middleware/errorHandler';
+import { requestId } from './middleware/requestId';
+import { compressionMiddleware } from './middleware/compression';
+import { requestLogger } from './middleware/requestLogger';
+import pool from './config/database';
 
 dotenv.config();
 
@@ -22,6 +26,12 @@ const app = express();
 
 // Security middleware
 app.use(helmet());
+
+// Request ID and compression
+app.use(requestId);
+app.use(compressionMiddleware);
+app.use(requestLogger);
+
 app.use(cors({
   origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
   credentials: true,
@@ -44,12 +54,23 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 // Health check - both paths for Docker Compose compatibility
-app.get('/health', (_req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
-app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
+const healthHandler = (_req: express.Request, res: express.Response) => {
+  const { version } = require('../package.json');
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    version,
+    uptime: process.uptime(),
+    memory: process.memoryUsage(),
+    pool: {
+      totalCount: pool.totalCount,
+      idleCount: pool.idleCount,
+      waitingCount: pool.waitingCount,
+    },
+  });
+};
+app.get('/health', healthHandler);
+app.get('/api/health', healthHandler);
 
 // Routes
 app.use('/api/auth', authRoutes);
