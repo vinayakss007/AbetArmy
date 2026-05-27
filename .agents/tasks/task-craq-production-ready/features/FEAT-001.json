@@ -1,0 +1,25 @@
+{
+  "id": "FEAT-001",
+  "type": "chore",
+  "description": "Verify baseline environment - ensure both backend and frontend build and pass tests before making changes",
+  "status": "completed",
+  "steps": [
+    "Run npm install in craq/backend/ to ensure dependencies are installed",
+    "Run npm run build in craq/backend/ (tsc) and confirm it exits 0",
+    "Run npm test in craq/backend/ and confirm all 34 tests pass",
+    "Run npm install in craq/frontend/ to ensure dependencies are installed",
+    "Run npm run build in craq/frontend/ (next build) and confirm it exits 0"
+  ],
+  "acceptance_criteria": [
+    "Backend tsc build completes with exit code 0",
+    "Backend jest tests all pass (34 tests)",
+    "Frontend next build completes with exit code 0"
+  ],
+  "verification": [
+    "npm run build in craq/backend/ exits 0",
+    "npm test in craq/backend/ shows all tests passing",
+    "npm run build in craq/frontend/ exits 0"
+  ],
+  "blocked_reason": null,
+  "findings": "All verification steps passed. Backend: tsc build exit 0, 5 test suites with 34 tests all passing. Frontend: next build exit 0 with 11 pages generated successfully. node_modules already present, no network fetch needed for install."
+}
