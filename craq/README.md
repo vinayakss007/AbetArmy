@@ -1,3 +1,9 @@
+![Node.js 22+](https://img.shields.io/badge/Node.js-22%2B-339933?logo=node.js&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white)
+![License: Private](https://img.shields.io/badge/License-Private-red)
+![Tests](https://img.shields.io/badge/Tests-64%20passing-brightgreen)
+![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
+
 # Craq
 
 > Crack any business problem
@@ -286,3 +292,155 @@ AI_FALLBACK_ORDER=anthropic,openai,groq,ollama
 ## License
 
 Private - All rights reserved.
+
+---
+
+## Documentation
+
+Comprehensive documentation is available in the [`docs/`](./docs/) directory:
+
+| Document | Description |
+|----------|-------------|
+| [Architecture](./docs/ARCHITECTURE.md) | System design, data flow, component diagram |
+| [API Reference](./docs/API.md) | Complete endpoint reference with curl examples |
+| [Deployment](./docs/DEPLOYMENT.md) | Production deployment and infrastructure guide |
+| [Development](./docs/DEVELOPMENT.md) | Local setup, coding standards, adding features |
+| [AI Configuration](./docs/AI_CONFIGURATION.md) | Multi-provider AI gateway setup |
+| [Security](./docs/SECURITY.md) | Security measures and OWASP compliance |
+| [Features](./docs/FEATURES.md) | Complete feature inventory and roadmap |
+| [Production Checklist](./docs/PRODUCTION_CHECKLIST.md) | Pre-launch verification checklist |
+
+---
+
+## Screenshots
+
+> Screenshots coming soon. The application features a modern dark/light mode UI with responsive design.
+
+| View | Description |
+|------|-------------|
+| Home | Issue feed with filtering and trending topics |
+| Issue Detail | Full issue view with solutions, comments, and voting |
+| AI Chat | Interactive AI assistant with streaming responses |
+| Profile | User profile with reputation score and contributions |
+| Tools | Business tools directory with categories and reviews |
+
+---
+
+## Contributing
+
+We welcome contributions! Please read the [Development Guide](./docs/DEVELOPMENT.md) for details on:
+
+- Setting up your local development environment
+- Coding standards and patterns we follow
+- How to add new features (routes, controllers, services, tests)
+- Testing guidelines and how mocking works
+- Git workflow and commit message conventions
+
+### Quick Contributing Steps
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feat/my-feature`)
+3. Follow the coding standards in [docs/DEVELOPMENT.md](./docs/DEVELOPMENT.md)
+4. Write tests for new functionality
+5. Run `npm test` in backend/ and ensure all tests pass
+6. Run `npm run build` in both backend/ and frontend/
+7. Commit with a type prefix (`feat:`, `fix:`, `chore:`, etc.)
+8. Open a pull request
+
+---
+
+## Troubleshooting
+
+### Port Conflicts
+
+**Problem:** `Error: listen EADDRINUSE: address already in use :::4000`
+
+**Solution:** Another process is using port 4000. Find and stop it:
+```bash
+# Find the process
+lsof -i :4000
+
+# Kill it
+kill -9 <PID>
+
+# Or change the port in .env
+PORT=4001
+```
+
+### Database Connection Refused
+
+**Problem:** `Error: connect ECONNREFUSED 127.0.0.1:5432`
+
+**Solution:** PostgreSQL is not running. Start it with Docker:
+```bash
+docker compose up postgres -d
+
+# Verify it is ready
+docker compose exec postgres pg_isready -U craq -d craq_db
+```
+
+### Node.js Version Mismatch
+
+**Problem:** Syntax errors or unexpected behavior
+
+**Solution:** Verify you are running Node.js 22+:
+```bash
+node --version  # Should show v22.x.x or higher
+
+# Use nvm to switch versions
+nvm install 22
+nvm use 22
+```
+
+### Frontend Build Errors
+
+**Problem:** `Module not found` or type errors during `npm run build`
+
+**Solution:**
+```bash
+# Clear node_modules and reinstall
+cd frontend
+rm -rf node_modules .next
+npm install
+npm run build
+```
+
+### Docker Compose Issues
+
+**Problem:** Containers fail to start or connect to each other
+
+**Solution:**
+```bash
+# Remove all containers and volumes, rebuild
+docker compose down -v
+docker compose up --build -d
+
+# Check logs for specific service
+docker compose logs postgres
+docker compose logs backend
+```
+
+### Redis Connection Failed
+
+**Problem:** `Error: Redis connection failed` on backend startup
+
+**Solution:** Ensure Redis is running:
+```bash
+docker compose up redis -d
+docker compose exec redis redis-cli ping  # Should return PONG
+```
+
+### AI Features Not Working
+
+**Problem:** AI endpoints return 503 errors
+
+**Solution:** At least one AI provider must be configured. Set an API key in `.env`:
+```bash
+# Easiest: use Groq (free tier available)
+GROQ_API_KEY=gsk_...
+
+# Or use local Ollama (free, no API key needed)
+OLLAMA_BASE_URL=http://localhost:11434
+```
+
+See [AI Configuration Guide](./docs/AI_CONFIGURATION.md) for full setup instructions.
