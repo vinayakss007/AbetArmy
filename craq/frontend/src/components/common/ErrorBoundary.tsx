@@ -54,7 +54,9 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
               Something went wrong
             </h2>
             <p className="mt-2 text-sm text-red-600 dark:text-red-400">
-              {this.state.error?.message || 'An unexpected error occurred.'}
+              {process.env.NODE_ENV === 'development' && this.state.error?.message
+                ? this.state.error.message
+                : 'An unexpected error occurred.'}
             </p>
             <button
               onClick={() => this.setState({ hasError: false, error: null })}

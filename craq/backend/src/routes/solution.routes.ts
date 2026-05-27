@@ -6,7 +6,7 @@ import { z } from 'zod';
 
 const router = Router();
 
-const createSolutionSchema = z.object({
+export const createSolutionSchema = z.object({
   body: z.object({
     content: z.string().min(1),
     images: z.array(z.string()).optional(),
@@ -19,7 +19,7 @@ const acceptSolutionSchema = z.object({
   }),
 });
 
-const updateSolutionSchema = z.object({
+export const updateSolutionSchema = z.object({
   body: z.object({
     content: z.string().min(1).optional(),
     images: z.array(z.string()).optional(),

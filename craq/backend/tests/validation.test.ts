@@ -1,60 +1,8 @@
-import { z } from 'zod';
-
-// Auth schemas
-const registerSchema = z.object({
-  body: z.object({
-    email: z.string().email(),
-    password: z.string().min(8),
-    name: z.string().min(1).max(255),
-  }),
-});
-
-const loginSchema = z.object({
-  body: z.object({
-    email: z.string().email(),
-    password: z.string().min(1),
-  }),
-});
-
-// Issue schema
-const createIssueSchema = z.object({
-  body: z.object({
-    title: z.string().min(1).max(500),
-    description: z.string().min(1),
-    images: z.array(z.string()).optional(),
-    category: z.string().optional(),
-    tags: z.array(z.string()).optional(),
-    industry: z.string().optional(),
-    stage: z.string().optional(),
-    type: z.string().optional(),
-  }),
-});
-
-// Solution schemas
-const createSolutionSchema = z.object({
-  body: z.object({
-    content: z.string().min(1),
-    images: z.array(z.string()).optional(),
-  }),
-});
-
-// Vote schema
-const voteSchema = z.object({
-  body: z.object({
-    targetType: z.enum(['issue', 'solution']),
-    targetId: z.string().uuid(),
-    value: z.number().refine((v) => v === 1 || v === -1),
-  }),
-});
-
-// Comment schema
-const createCommentSchema = z.object({
-  body: z.object({
-    parentType: z.enum(['issue', 'solution', 'comment']),
-    parentId: z.string().uuid(),
-    content: z.string().min(1),
-  }),
-});
+import { registerSchema, loginSchema } from '../src/routes/auth.routes';
+import { createIssueSchema } from '../src/routes/issue.routes';
+import { createSolutionSchema } from '../src/routes/solution.routes';
+import { voteSchema } from '../src/routes/vote.routes';
+import { createCommentSchema } from '../src/routes/comment.routes';
 
 describe('Auth validation schemas', () => {
   describe('register schema', () => {

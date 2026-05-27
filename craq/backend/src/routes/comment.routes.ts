@@ -6,7 +6,7 @@ import { z } from 'zod';
 
 const router = Router();
 
-const createCommentSchema = z.object({
+export const createCommentSchema = z.object({
   body: z.object({
     parentType: z.enum(['issue', 'solution', 'comment']),
     parentId: z.string().uuid(),

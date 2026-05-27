@@ -6,7 +6,7 @@ import { z } from 'zod';
 
 const router = Router();
 
-const voteSchema = z.object({
+export const voteSchema = z.object({
   body: z.object({
     targetType: z.enum(['issue', 'solution']),
     targetId: z.string().uuid(),

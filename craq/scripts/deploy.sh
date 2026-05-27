@@ -30,7 +30,10 @@ if [ ! -f ".env" ]; then
     fail ".env file not found. Copy .env.example and configure production values."
 fi
 
+# Load environment variables safely (only KEY=value lines, no shell execution)
+set -a
 source .env
+set +a
 
 # Check critical secrets
 if [ -z "$JWT_SECRET" ] || [ "$JWT_SECRET" = "your-jwt-secret-key-change-in-production" ]; then

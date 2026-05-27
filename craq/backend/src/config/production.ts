@@ -30,8 +30,8 @@ export function validateProductionConfig(): void {
   }
 
   if (errors.length > 0) {
-    console.error('Production configuration validation failed:');
-    errors.forEach((err) => console.error(`  - ${err}`));
-    process.exit(1);
+    throw new Error(
+      `Production configuration validation failed:\n${errors.map((err) => `  - ${err}`).join('\n')}`
+    );
   }
 }

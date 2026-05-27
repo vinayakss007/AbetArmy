@@ -6,7 +6,7 @@ import { z } from 'zod';
 
 const router = Router();
 
-const createIssueSchema = z.object({
+export const createIssueSchema = z.object({
   body: z.object({
     title: z.string().min(1).max(500),
     description: z.string().min(1),
