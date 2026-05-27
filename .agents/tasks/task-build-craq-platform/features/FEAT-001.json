@@ -1,0 +1,44 @@
+{
+  "id": "FEAT-001",
+  "type": "feat",
+  "description": "Project scaffolding, Docker Compose infrastructure, and backend foundation with database schema. Sets up the entire project structure inside /projects/sandbox/AbetArmy/craq/ folder including Express backend with TypeScript, PostgreSQL database with full schema for all entities (users, issues, solutions, comments, votes, tools, tags), JWT auth with Google OAuth, and Docker Compose for PostgreSQL + Redis.",
+  "status": "completed",
+  "steps": [
+    "Create /projects/sandbox/AbetArmy/craq/docker-compose.yml with PostgreSQL 16, Redis 7, and Meilisearch services. Include volume mounts and health checks.",
+    "Initialize /projects/sandbox/AbetArmy/craq/backend/ as a Node.js TypeScript project with package.json including dependencies: express, pg, jsonwebtoken, bcryptjs, passport, passport-google-oauth20, multer, cors, helmet, express-rate-limit, zod, dotenv, uuid, ws. Dev deps: typescript, ts-node, nodemon, jest, ts-jest, @types/*.",
+    "Create tsconfig.json for the backend with strict mode, ES2022 target, paths aliases.",
+    "Create /projects/sandbox/AbetArmy/craq/backend/src/ directory structure: controllers/, services/, routes/, middleware/, models/, config/, utils/, types/, websocket/.",
+    "Create /projects/sandbox/AbetArmy/craq/backend/src/config/database.ts - PostgreSQL connection pool using pg library with environment variables.",
+    "Create /projects/sandbox/AbetArmy/craq/backend/src/config/redis.ts - Redis client connection.",
+    "Create /projects/sandbox/AbetArmy/craq/backend/src/db/schema.sql - Full database schema with tables: users (id, email, password_hash, name, avatar_url, bio, industry, stage, role, skills, reputation_score, google_id, created_at, updated_at), issues (id, author_id, title, description, images, category, tags, status, industry, stage, type, upvotes, downvotes, accepted_solution_id, created_at, updated_at), solutions (id, issue_id, author_id, content, images, upvotes, downvotes, is_accepted, created_at, updated_at), comments (id, parent_type, parent_id, author_id, content, created_at, updated_at), votes (id, user_id, target_type, target_id, value, created_at), tools (id, name, description, url, category, linked_issue_types, created_at, updated_at), tool_reviews (id, tool_id, user_id, rating, content, created_at), tags (id, name, type, created_at), issue_tags (issue_id, tag_id). Use UUIDs for primary keys. Add proper indexes and constraints.",
+    "Create /projects/sandbox/AbetArmy/craq/backend/src/db/init.ts - Script to run schema.sql against database.",
+    "Create /projects/sandbox/AbetArmy/craq/backend/src/types/ - TypeScript interfaces for User, Issue, Solution, Comment, Vote, Tool, Tag matching the database schema.",
+    "Create /projects/sandbox/AbetArmy/craq/backend/src/middleware/auth.ts - JWT verification middleware that extracts user from token and attaches to request.",
+    "Create /projects/sandbox/AbetArmy/craq/backend/src/middleware/errorHandler.ts - Global error handler with proper error response format.",
+    "Create /projects/sandbox/AbetArmy/craq/backend/src/middleware/validate.ts - Zod-based request validation middleware.",
+    "Create /projects/sandbox/AbetArmy/craq/backend/src/services/auth.service.ts - AuthService with methods: register(email, password, name), login(email, password), googleAuth(googleProfile), generateToken(userId), verifyToken(token), refreshToken(token).",
+    "Create /projects/sandbox/AbetArmy/craq/backend/src/controllers/auth.controller.ts - Endpoints: POST /auth/register, POST /auth/login, GET /auth/google, GET /auth/google/callback, POST /auth/refresh, GET /auth/me.",
+    "Create /projects/sandbox/AbetArmy/craq/backend/src/routes/auth.routes.ts - Wire up auth controller to Express router.",
+    "Create /projects/sandbox/AbetArmy/craq/backend/src/app.ts - Express app setup with CORS, helmet, rate limiting, JSON parsing, routes mounting, error handler.",
+    "Create /projects/sandbox/AbetArmy/craq/backend/src/server.ts - Entry point that starts Express server and initializes database connection.",
+    "Create /projects/sandbox/AbetArmy/craq/backend/.env.example with all required environment variables.",
+    "Add npm scripts in package.json: dev (nodemon), build (tsc), start (node dist/server.js), test (jest), db:init (ts-node src/db/init.ts).",
+    "Create /projects/sandbox/AbetArmy/craq/backend/jest.config.ts with ts-jest preset.",
+    "Create basic tests in /projects/sandbox/AbetArmy/craq/backend/tests/auth.test.ts testing register and login service methods.",
+    "Verify: run npm install and npm run build in the backend directory to confirm TypeScript compilation succeeds."
+  ],
+  "acceptance_criteria": [
+    "Docker Compose file exists and defines PostgreSQL, Redis, and Meilisearch services",
+    "Backend TypeScript compiles without errors via npm run build",
+    "Database schema SQL file contains all required tables with proper relationships",
+    "Auth service implements register, login, and JWT token generation",
+    "Backend tests exist and pass with npm test",
+    "All environment variables are documented in .env.example"
+  ],
+  "verification": [
+    "cd /projects/sandbox/AbetArmy/craq/backend && npm install && npm run build",
+    "cd /projects/sandbox/AbetArmy/craq/backend && npm test"
+  ],
+  "blocked_reason": null,
+  "findings": "Build and tests pass successfully. Used parseDuration helper to convert string durations to seconds for jwt.sign expiresIn option due to strict typing in newer @types/jsonwebtoken. Added redis package to dependencies for redis client. All 8 auth tests passing."
+}

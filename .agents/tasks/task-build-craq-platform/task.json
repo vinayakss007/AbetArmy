@@ -1,0 +1,7 @@
+{
+  "task_id": "task-build-craq-platform",
+  "task_description": "Build Craq - a social media platform for entrepreneurs and business people where they post business challenges and the community provides solutions. Full-stack app with Next.js frontend, Express backend, PostgreSQL, Redis, AI gateway with multi-provider support, and real-time notifications. Everything built inside /projects/sandbox/AbetArmy/craq/ folder.",
+  "status": "in_progress",
+  "feature_order": ["FEAT-001", "FEAT-002", "FEAT-003", "FEAT-004"],
+  "blocked_reason": null
+}

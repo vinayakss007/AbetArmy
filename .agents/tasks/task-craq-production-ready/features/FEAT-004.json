@@ -1,0 +1,43 @@
+{
+  "id": "FEAT-004",
+  "type": "docs",
+  "description": "Create comprehensive documentation in craq/docs/ and operational scripts in craq/scripts/, plus update the root README.md",
+  "status": "completed",
+  "steps": [
+    "Create craq/docs/ directory and craq/scripts/ directory.",
+    "Create craq/docs/ARCHITECTURE.md - Full system architecture documentation including: text-based system diagram (ASCII), data flow (client -> Next.js -> Express API -> PostgreSQL/Redis/AI providers), service layer architecture (controllers -> services -> database), WebSocket real-time notification system, multi-provider AI gateway with fallback chain, authentication flow (JWT + Google OAuth), database schema overview with table relationships, technology choices and rationale for each layer.",
+    "Create craq/docs/API.md - Complete API reference with full request/response examples for EVERY endpoint: Auth (register, login, refresh, google oauth), Issues (CRUD + list with filters + solve), Solutions (CRUD + list by issue), Votes (create, delete), Comments (CRUD by issue), AI (categorize, similar-issues, solution-draft, summarize, chat), Search (full-text), Tools (list, create), Users (get profile, update profile), Upload (file upload). Include curl examples, request headers, response JSON, error responses, and authentication requirements for each endpoint.",
+    "Create craq/docs/DEPLOYMENT.md - Step-by-step production deployment guide covering: Docker Compose single-server deployment (with all env vars explained), cloud deployment strategies (AWS ECS/EC2, GCP Cloud Run, DigitalOcean App Platform), SSL/HTTPS setup with Let's Encrypt and nginx reverse proxy config, domain configuration, database backup strategy (pg_dump cron, point-in-time recovery), monitoring setup (health check endpoint usage, uptime monitoring, log aggregation with structured JSON logs), scaling considerations.",
+    "Create craq/docs/DEVELOPMENT.md - Local development setup guide: prerequisites, step-by-step setup, coding standards (TypeScript strict, Zod validation, service layer pattern), how to add new features (create route, controller, service, test), testing guide (how tests work with mocked pool, how to write new tests), PR workflow, hot reload setup, debugging tips.",
+    "Create craq/docs/AI_CONFIGURATION.md - AI provider setup guide: how to configure each provider (OpenAI, Anthropic, Groq, Ollama, custom OpenAI-compatible), fallback order configuration, rate limits and token budgets via env vars, how to add a custom provider (extend ai.config.ts), streaming support, error handling and retry behavior, cost optimization tips.",
+    "Create craq/docs/SECURITY.md - Security documentation: authentication system (JWT access/refresh tokens, Google OAuth), password hashing (bcrypt with 12 rounds), rate limiting configuration, helmet security headers, CORS policy, input validation with Zod, SQL injection prevention (parameterized queries), XSS prevention, CSRF considerations for SPA, production secret management, OWASP Top 10 compliance notes.",
+    "Create craq/docs/FEATURES.md - Complete feature inventory with status: all implemented features (issue tracking, solutions, voting, comments, AI categorization, AI solution drafts, AI summarization, AI chat with streaming, full-text search, file uploads, Google OAuth, real-time WebSocket notifications, business tools directory, user profiles, dark mode, responsive design), planned features (email notifications, analytics dashboard, admin panel, API rate limiting per user, webhook integrations).",
+    "Create craq/docs/PRODUCTION_CHECKLIST.md - Pre-launch checklist with checkboxes covering: environment variables, JWT secrets, database setup and backup, rate limits, CORS, SSL/HTTPS, monitoring, error tracking (Sentry integration instructions), log aggregation, load testing recommendations, security audit items, DNS configuration, CDN setup, database indexing verification.",
+    "Create craq/scripts/setup.sh - One-command local setup: check for Node.js 22+, Docker, Docker Compose; copy .env.example to .env if not exists; npm install in backend/ and frontend/; docker compose up postgres redis meilisearch -d; wait for services; npm run db:init in backend/; print success message with URLs.",
+    "Create craq/scripts/deploy.sh - Production deployment script: validate required env vars, docker compose pull, docker compose up --build -d, wait for health checks, run database migrations if needed, print status.",
+    "Create craq/scripts/backup-db.sh - Database backup: creates timestamped pg_dump backup to a backups/ directory, supports BACKUP_DIR env var, keeps last 7 days of backups (auto-cleanup), supports S3 upload if AWS CLI is configured.",
+    "Create craq/scripts/health-check.sh - Check health of all services: backend /api/health endpoint, PostgreSQL pg_isready, Redis ping, frontend HTTP status, report overall status with exit code.",
+    "Create craq/scripts/seed-data.sh - Seed database with sample data for demos: create sample users, issues across categories, solutions, comments, votes, and tools. Use curl against the running API.",
+    "Update craq/README.md - Add badges section (Node.js version, TypeScript, license), add a screenshots placeholder section, expand the contributing section with link to docs/DEVELOPMENT.md, add a troubleshooting/FAQ section (common issues like port conflicts, database connection errors, node version mismatch), add links to all docs/ files in a Documentation section.",
+    "Make all scripts executable (chmod +x)."
+  ],
+  "acceptance_criteria": [
+    "craq/docs/ directory exists with 8 markdown files: ARCHITECTURE.md, API.md, DEPLOYMENT.md, DEVELOPMENT.md, AI_CONFIGURATION.md, SECURITY.md, FEATURES.md, PRODUCTION_CHECKLIST.md",
+    "craq/scripts/ directory exists with 5 shell scripts: setup.sh, deploy.sh, backup-db.sh, health-check.sh, seed-data.sh",
+    "All documentation files have substantive content (not stubs) with real details from the codebase",
+    "API.md has curl examples for every endpoint with request/response JSON",
+    "PRODUCTION_CHECKLIST.md has actionable checkbox items",
+    "All scripts are executable and have proper shebang lines",
+    "Updated README.md links to all documentation files",
+    "Backend build still passes (npm run build in backend/)",
+    "Frontend build still passes (npm run build in frontend/)"
+  ],
+  "verification": [
+    "Run npm run build in craq/backend/ and confirm exit code 0",
+    "Run npm run build in craq/frontend/ and confirm exit code 0",
+    "Verify all 8 docs files exist with content: ls -la craq/docs/",
+    "Verify all 5 scripts exist and are executable: ls -la craq/scripts/"
+  ],
+  "blocked_reason": null,
+  "findings": "All 8 documentation files and 5 scripts created successfully. Backend build passes (tsc), frontend build passes (next build), all 64 tests pass. Scripts are executable (chmod +x). README updated with badges, docs links, screenshots placeholder, contributing section, and troubleshooting FAQ."
+}

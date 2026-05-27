@@ -1,0 +1,39 @@
+{
+  "id": "FEAT-002",
+  "type": "feat",
+  "description": "Backend production hardening - add middleware, utilities, enhanced configuration, and additional tests for production readiness",
+  "status": "completed",
+  "steps": [
+    "Create craq/backend/src/utils/logger.ts - a structured JSON logger using pino (add pino to dependencies). Export a configured logger instance with request context support. Include log levels, timestamp formatting, and production vs development output modes.",
+    "Create craq/backend/src/middleware/requestId.ts - middleware that generates a UUID correlation ID (from uuid package already installed) for each request, sets it on req and as X-Request-ID response header. Store on req object via extending Express Request interface in types.",
+    "Create craq/backend/src/middleware/requestLogger.ts - middleware that logs each request/response using the logger from utils/logger.ts. Log: method, url, status code, response time in ms, request ID, user ID if authenticated. Use JSON format.",
+    "Create craq/backend/src/middleware/compression.ts - export a configured compression middleware using the 'compression' npm package (add to dependencies). Set threshold to 1kb, level 6.",
+    "Create craq/backend/src/config/production.ts - production configuration module that validates required env vars in production mode (JWT_SECRET, JWT_REFRESH_SECRET not defaults, DB_HOST set, REDIS_URL set). Export a validateProductionConfig() function.",
+    "Create craq/backend/src/utils/gracefulShutdown.ts - graceful shutdown handler that: listens for SIGTERM/SIGINT, stops accepting new connections, closes WebSocket connections, drains the DB pool, disconnects Redis, logs shutdown status, exits. Export a setupGracefulShutdown(server, pool, redisClient) function.",
+    "Update craq/backend/src/app.ts - integrate the new middleware in this order after helmet: requestId, compression, requestLogger. Import and wire them up. Also add a more detailed health check at /api/health that includes: database pool status (total/idle/waiting counts from pool), uptime, memory usage, and version from package.json.",
+    "Update craq/backend/src/server.ts - integrate gracefulShutdown setup after server starts listening. Call setupGracefulShutdown with the http server, pool, and redis client. Also call validateProductionConfig() at startup if NODE_ENV=production.",
+    "Add Zod validation schemas to routes that lack them: craq/backend/src/routes/solution.routes.ts (create/update solution body validation), craq/backend/src/routes/vote.routes.ts (create vote validation), craq/backend/src/routes/comment.routes.ts (create comment validation), craq/backend/src/routes/user.routes.ts (update profile validation), craq/backend/src/routes/auth.routes.ts (register/login body validation), craq/backend/src/routes/ai.routes.ts (validate required fields for each AI endpoint).",
+    "Update the issue list endpoint response in craq/backend/src/controllers/issue.controller.ts to include pagination metadata: return { issues, total, page, limit, totalPages } instead of just { issues, total }.",
+    "Create craq/backend/tests/middleware.test.ts - test the requestId middleware (sets header, attaches to req), and test requestLogger (logs request info). Mock the logger.",
+    "Create craq/backend/tests/gracefulShutdown.test.ts - test that setupGracefulShutdown registers signal handlers and calls pool.end() and redis quit on SIGTERM.",
+    "Create craq/backend/tests/validation.test.ts - test that the Zod schemas reject invalid input for auth (missing email, short password), issues (empty title), solutions (empty content), and votes (invalid target_type).",
+    "Run npm install to install new deps (pino, compression, @types/compression), then run npm run build and npm test to confirm everything passes."
+  ],
+  "acceptance_criteria": [
+    "All new middleware files exist and export their functions correctly",
+    "The app.ts file imports and uses requestId, compression, and requestLogger middleware",
+    "The server.ts file calls gracefulShutdown setup and production config validation",
+    "All route files have Zod validation schemas for their POST/PUT endpoints",
+    "Issue list endpoint returns pagination metadata (page, limit, totalPages)",
+    "Health check at /api/health returns pool stats, uptime, and memory info",
+    "New tests pass: middleware.test.ts, gracefulShutdown.test.ts, validation.test.ts",
+    "npm run build exits 0 with no TypeScript errors",
+    "npm test passes all tests (existing 34 + new ones)"
+  ],
+  "verification": [
+    "Run npm run build in craq/backend/ and confirm exit code 0",
+    "Run npm test in craq/backend/ and confirm all tests pass including new ones"
+  ],
+  "blocked_reason": null,
+  "findings": "All 64 tests pass (34 existing + 30 new). Build exits 0. New packages installed: pino, pino-pretty, compression, @types/compression. AI routes already had full Zod validation. Auth routes already had validation. Vote and comment routes already had validation. Added validation to solution PUT and user PUT routes which lacked it. The issue list endpoint now returns pagination metadata (page, limit, totalPages). Used 'as any' cast for redisClient in server.ts setupGracefulShutdown call due to complex Redis generic types."
+}
