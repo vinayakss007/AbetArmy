@@ -50,7 +50,7 @@ export default function Header() {
               </span>
             </Link>
 
-            <nav className="hidden md:flex items-center gap-1">
+            <nav className="hidden md:flex items-center gap-1" role="navigation" aria-label="Main navigation">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
@@ -87,6 +87,8 @@ export default function Header() {
                   <button
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
                     className="flex items-center gap-2 p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-all duration-300"
+                    aria-label="User menu"
+                    aria-expanded={userMenuOpen}
                   >
                     <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-400 to-accent-400 flex items-center justify-center">
                       <User className="h-4 w-4 text-white" />
@@ -142,6 +144,7 @@ export default function Header() {
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="md:hidden p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
               aria-label="Toggle menu"
+              aria-expanded={mobileMenuOpen}
             >
               {mobileMenuOpen ? (
                 <X className="h-6 w-6 text-gray-600 dark:text-gray-300" />
