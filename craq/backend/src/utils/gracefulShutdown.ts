@@ -24,8 +24,11 @@ export function setupGracefulShutdown(
     }, SHUTDOWN_TIMEOUT);
 
     try {
-      server.close(() => {
-        logger.info('HTTP server closed');
+      await new Promise<void>((resolve) => {
+        server.close(() => {
+          logger.info('HTTP server closed');
+          resolve();
+        });
       });
 
       await pool.end();
