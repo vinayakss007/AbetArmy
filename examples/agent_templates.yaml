@@ -1,0 +1,140 @@
+# AI Agent Fleet Platform - Agent Templates
+# Example configurations for different agent types
+
+# 1. Conversational Agent (Customer Support)
+conversational_customer_support:
+  name: "Customer Support Agent"
+  description: "Handles customer inquiries with web search and database access"
+  type: "conversational"
+  llm_provider: "openai"
+  llm_model: "gpt-4"
+  llm_temperature: 0.7
+  llm_max_tokens: 1000
+  llm_system_prompt: |
+    You are a helpful customer support agent for Acme Corp.
+    Your goals:
+    1. Understand customer issues
+    2. Search knowledge base for solutions
+    3. Escalate complex issues when needed
+    4. Maintain professional, friendly tone
+    
+    Available tools:
+    - web_search: Search company knowledge base
+    - database_query: Access customer records
+    - ticket_system: Create support tickets
+    
+  available_tools: ["web_search", "database_query", "ticket_system"]
+  max_concurrent_tasks: 5
+  timeout_seconds: 120
+
+# 2. Compliant Web Crawler (Market Research)
+compliant_crawler:
+  name: "Market Research Crawler"
+  description: "Responsible web crawler for market analysis with rate limiting"
+  type: "crawler"
+  llm_provider: "none"  # Rule-based agent
+  execution_strategy: "batch"
+  available_tools: ["web_crawl", "data_extract", "rate_limiter"]
+  tool_configs:
+    web_crawl:
+      respect_robots_txt: true
+      rate_limit_per_second: 2
+      user_agent: "AcmeResearchBot/1.0 (+https://acme.com/bot)"
+    rate_limiter:
+      requests_per_hour: 1000
+      delay_between_requests_ms: 1000
+  max_concurrent_tasks: 3
+  timeout_seconds: 3600
+
+# 3. Monitoring Agent (Uptime Monitor)
+monitoring_uptime:
+  name: "Website Uptime Monitor"
+  description: "Monitors website availability and performance"
+  type: "monitoring"
+  llm_provider: "none"
+  available_tools: ["http_check", "performance_metrics", "alert_system"]
+  tool_configs:
+    http_check:
+      check_interval_seconds: 60
+      timeout_seconds: 10
+      expected_status_codes: [200, 301, 302]
+    alert_system:
+      channels: ["email", "slack", "webhook"]
+      thresholds:
+        response_time_ms: 5000
+        error_rate_percent: 5
+  max_concurrent_tasks: 10
+  timeout_seconds: 30
+
+# 4. Transactional Agent (Booking System)
+transactional_booking:
+  name: "Booking System Agent"
+  description: "Handles appointment scheduling and booking"
+  type: "transactional"
+  llm_provider: "openai"
+  llm_model: "gpt-4"
+  llm_temperature: 0.3
+  llm_system_prompt: |
+    You are a booking assistant for appointments.
+    Your responsibilities:
+    1. Understand booking requirements
+    2. Check availability in calendar
+    3. Create/update bookings
+    4. Send confirmation emails
+    
+    Always confirm details before finalizing.
+  available_tools: ["calendar_check", "booking_create", "email_send", "payment_process"]
+  data_sources: ["customer_db", "calendar_db"]
+  max_concurrent_tasks: 3
+  timeout_seconds: 180
+
+# 5. Data Research Agent
+data_research_analyst:
+  name: "Data Research Analyst"
+  description: "Analyzes data and generates reports"
+  type: "data_research"
+  llm_provider: "openai"
+  llm_model: "gpt-4"
+  llm_temperature: 0.5
+  available_tools: ["data_query", "statistical_analysis", "chart_generate", "report_builder"]
+  data_access_rules:
+    customer_db: "read_only"
+    sales_data: "aggregated_only"
+    financial_data: "requires_approval"
+  max_concurrent_tasks: 2
+  max_tokens_per_month: 1000000
+
+# 6. Entertainment NPC Agent
+entertainment_npc:
+  name: "Game NPC Character"
+  description: "Interactive NPC for games and entertainment"
+  type: "entertainment"
+  llm_provider: "openai"
+  llm_model: "gpt-4"
+  llm_temperature: 0.8
+  llm_system_prompt: |
+    You are a friendly character in a fantasy game.
+    Personality: Helpful, witty, knowledgeable about the game world.
+    Keep responses concise and in-character.
+    Avoid breaking immersion with modern references.
+  available_tools: ["dialogue_system", "inventory_check", "quest_tracker"]
+  max_concurrent_tasks: 1
+  timeout_seconds: 30
+
+# 7. Custom Agent Template
+custom_agent:
+  name: "Custom Agent Template"
+  description: "Template for creating custom agents"
+  type: "custom"
+  llm_provider: "openai"
+  llm_model: "gpt-4"
+  llm_temperature: 0.7
+  available_tools: []
+  tool_configs: {}
+  data_sources: []
+  data_access_rules: {}
+  execution_strategy: "sequential"
+  retry_config:
+    max_retries: 3
+    backoff_factor: 1.5
+  timeout_seconds: 300
